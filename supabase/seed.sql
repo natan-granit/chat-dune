@@ -1,0 +1,2 @@
+-- Seed data for local development
+-- Populated in task 3.1 once schema migrations are defined

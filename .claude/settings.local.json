@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source ~/.zshrc)",
+      "Bash(npx skills:*)",
+      "Bash(open:*)",
+      "Skill(update-config)",
+      "Bash(ln:*)",
+      "Bash(chmod:*)",
+      "Bash(cp -r /Users/natan.granit/.agents/skills/checkpoint /Users/natan.granit/.claude/skills/)",
+      "Bash(cp -r /Users/natan.granit/.agents/skills/scope-task /Users/natan.granit/.claude/skills/)",
+      "Bash(make --dry-run dev)",
+      "Bash(make --dry-run run)",
+      "Bash(make --dry-run test)",
+      "Bash(make --dry-run check)",
+      "Bash(make --dry-run db-migrate)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
