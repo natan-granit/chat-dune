@@ -16,7 +16,13 @@
       "Bash(make --dry-run db-migrate)",
       "Bash(git init:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx:*)",
+      "Bash(printf \"n\\\\nn\\\\n\")",
+      "Bash(yes n:*)",
+      "Bash(npm install:*)",
+      "Bash(yes \"\")",
+      "Bash(npm run:*)"
     ]
   }
 }

@@ -35,8 +35,8 @@
 **Description**: Scaffold the Next.js frontend application with all core configuration, dependencies, and tooling.
 
 **Requirements**:
-- [ ] Run `npx create-next-app@latest frontend --typescript --tailwind --app --src-dir --eslint`
-- [ ] Install core dependencies:
+- [x] Run `npx create-next-app@latest frontend --typescript --tailwind --app --src-dir --eslint`
+- [x] Install core dependencies:
   - `@anthropic-ai/sdk`, `ai` (Vercel AI SDK)
   - `@supabase/supabase-js`, `@supabase/ssr`
   - `@tanstack/react-query`
@@ -44,12 +44,12 @@
   - `zod`
   - `papaparse` (CSV parsing)
   - `lucide-react`
-- [ ] Install and configure shadcn/ui (`npx shadcn@latest init`)
-- [ ] Add shadcn components: `button`, `input`, `textarea`, `card`, `dialog`, `dropdown-menu`, `table`, `badge`, `sidebar`, `tooltip`, `separator`
-- [ ] Configure ESLint with `@typescript-eslint`, Prettier, and `prettier-plugin-tailwindcss`
-- [ ] Add pre-commit hooks via Husky + lint-staged (typecheck + lint + format on staged files)
-- [ ] Configure `tsconfig.json` with strict mode and path aliases (`@/*` → `src/*`)
-- [ ] Set up JetBrains Mono + Inter via `next/font`
+- [x] Install and configure shadcn/ui (`npx shadcn@latest init`)
+- [x] Add shadcn components: `button`, `input`, `textarea`, `card`, `dialog`, `dropdown-menu`, `table`, `badge`, `sidebar`, `tooltip`, `separator`
+- [x] Configure ESLint with `@typescript-eslint`, Prettier, and `prettier-plugin-tailwindcss`
+- [x] Add pre-commit hooks via Husky + lint-staged (typecheck + lint + format on staged files)
+- [x] Configure `tsconfig.json` with strict mode and path aliases (`@/*` → `src/*`)
+- [x] Set up JetBrains Mono + Inter via `next/font`
 
 **Implementation Notes**:
 - Use Next.js App Router exclusively — no Pages Router
