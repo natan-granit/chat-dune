@@ -22,7 +22,11 @@
       "Bash(yes n:*)",
       "Bash(npm install:*)",
       "Bash(yes \"\")",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(git -C /Users/natan.granit/chat-dune status)",
+      "Bash(git -C /Users/natan.granit/chat-dune diff)",
+      "Bash(git -C /Users/natan.granit/chat-dune add .claude/settings.local.json)",
+      "Bash(git -C:*)"
     ]
   }
 }
