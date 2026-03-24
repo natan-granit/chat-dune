@@ -26,7 +26,12 @@
       "Bash(git -C /Users/natan.granit/chat-dune status)",
       "Bash(git -C /Users/natan.granit/chat-dune diff)",
       "Bash(git -C /Users/natan.granit/chat-dune add .claude/settings.local.json)",
-      "Bash(git -C:*)"
+      "Bash(git -C:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh run:*)",
+      "Bash(gh api:*)"
     ]
   }
 }

@@ -91,7 +91,7 @@
 - [x] Create `.github/workflows/ci.yml` running on push and PR to main
 - [x] CI steps: `npm ci`, `npm run typecheck`, `npm run lint`, `npm run format:check`
 - [x] Add `typecheck`, `lint`, `format:check`, `format` scripts to `frontend/package.json`
-- [ ] Configure branch protection on `main` requiring CI to pass before merge
+- [x] Configure branch protection on `main` requiring CI to pass before merge
 
 **Implementation Notes**:
 - Use `tsc --noEmit` for typecheck (not `next build` — too slow for CI)
