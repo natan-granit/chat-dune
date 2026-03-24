@@ -166,17 +166,24 @@
 **Description**: Catalog Starknet Poseidon event selectors for known protocols and build a reference that will be injected into the system prompt and stored in Supabase, compensating for Dune's lack of decoded Starknet tables.
 
 **Requirements**:
-- [ ] Catalog event selectors (Poseidon hashes) for key Starknet token standards: ERC-20 `Transfer`, `Approval`; ERC-721 `Transfer`; ERC-4626 `Deposit`/`Withdraw`
-- [ ] Catalog selectors for major Starknet protocols: JediSwap, AVNU, Ekubo (Swap, Mint, Burn events), Nostra (supply/borrow events), StarkGate bridge events
-- [ ] For each selector, document: event name, emitting contracts, `keys[]` parameter layout, `data[]` parameter layout, and a sample DuneSQL snippet
-- [ ] Produce `research/starknet-selectors.md` as a human-readable reference
-- [ ] Produce `research/starknet-selectors.json` as a machine-readable registry (to seed the DB in task 3.1)
+- [x] Catalog event selectors (Poseidon hashes) for key Starknet token standards: ERC-20 `Transfer`, `Approval`; ERC-721 `Transfer`; ERC-4626 `Deposit`/`Withdraw`
+- [x] Catalog selectors for major Starknet protocols: JediSwap, AVNU, Ekubo (Swap, Mint, Burn events), Nostra (supply/borrow events), StarkGate bridge events
+- [x] For each selector, document: event name, emitting contracts, `keys[]` parameter layout, `data[]` parameter layout, and a sample DuneSQL snippet
+- [x] Produce `research/starknet-selectors.md` as a human-readable reference
+- [x] Produce `research/starknet-selectors.json` as a machine-readable registry (to seed the DB in task 3.1)
 
 **Implementation Notes**:
 - Poseidon selectors can be derived from the Cairo ABI or verified on Starkscan/Voyager by inspecting known transactions
 - Priority order: ERC-20 Transfer (highest volume), DEX Swap events, bridge events, lending events
 - The JSON format should match the `starknet_selectors` DB table schema from task 3.1: `{ selector, event_name, contract_addresses[], keys_layout[], data_layout[] }`
 - This registry is what enables the LLM to write correct raw `starknet.events` queries without guessing array indices
+
+**Empirical verification (2026-03-24)** — key corrections after live Dune MCP checks:
+- Ekubo core contract address corrected to `0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b`
+- AVNU, Ekubo (Swapped/PositionUpdated/PoolInitialized), JediSwap V2 (Swap/Burn), StarkGate, Nostra Deposit/Withdraw, zkLend AccumulatorsSync all verified ✅
+- zkLend inactive since 2025-02-11; Nostra nToken contracts are now the primary Deposit/Withdraw emitters
+- JediSwap V2 Mint selector suspect; Borrow selector suspect (0 events live)
+- 4 unidentified Ekubo selectors and 1 unidentified JediSwap V2 add-liquidity selector logged in registry pending ABI lookup
 
 ---
 
@@ -196,7 +203,7 @@
   - `messages`: user can only read/write messages in their own threads
   - `address_mappings`: all authenticated users can read workspace mappings; only admins can write
 - [ ] Create indexes: `messages(thread_id)`, `address_mappings(address, chain)`, `threads(user_id, updated_at DESC)`
-- [ ] Create `supabase/seed.sql` with dev seed data (sample threads, messages, address mappings)
+- [ ] Create `supabase/seed.sql` with dev seed data (sample threads, messages, address mappings) — seed `address_mappings` from `research/address-mappings-seed.csv` (399 entries: 180 Starknet contracts from internal resolver v2.1 + 210 staker addresses + 9 delegation pool contracts; pool→validator name mapping to be completed in a future pass)
 - [ ] Generate TypeScript types with `make db-types`
 
 **Implementation Notes**:

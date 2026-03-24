@@ -69,7 +69,18 @@
       "WebFetch(domain:app.gitbook.com)",
       "WebFetch(domain:api.starknet.id)",
       "WebFetch(domain:www.dappland.com)",
-      "WebFetch(domain:defillama.com)"
+      "WebFetch(domain:defillama.com)",
+      "Bash(node -e \":*)",
+      "Bash(node:*)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:starknet-selector-decoder.com)",
+      "WebFetch(domain:ekubo.org)",
+      "mcp__dune__createDuneQuery",
+      "mcp__dune__executeQueryById",
+      "mcp__dune__getExecutionResults",
+      "Bash(python3:*)",
+      "mcp__dune__searchTables",
+      "mcp__dune__updateDuneQuery"
     ]
   }
 }

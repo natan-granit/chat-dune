@@ -1,0 +1,533 @@
+[
+  {
+    "selector": "0x0099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
+    "event_name": "Transfer",
+    "protocol": "ERC-20",
+    "contract_addresses": [],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "from", "type": "ContractAddress" },
+      { "index": 2, "name": "to", "type": "ContractAddress" },
+      { "index": 3, "name": "amount_low", "type": "u128" },
+      { "index": 4, "name": "amount_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Verified empirically on STRK token (~225K events/day on Dune). Pre-SNIP-13 layout: from/to/value are in data[], NOT keys[]. This is the dominant layout for Starknet ERC-20 tokens. Shares the same selector as ERC-721 Transfer — distinguish by contract address or by checking keys vs data cardinality (ERC-721 puts all params in keys[])."
+  },
+  {
+    "selector": "0x0099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
+    "event_name": "Transfer",
+    "protocol": "ERC-721",
+    "contract_addresses": [],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" },
+      { "index": 2, "name": "from", "type": "ContractAddress" },
+      { "index": 3, "name": "to", "type": "ContractAddress" },
+      { "index": 4, "name": "token_id_low", "type": "u128" },
+      { "index": 5, "name": "token_id_high", "type": "u128" }
+    ],
+    "data_layout": [],
+    "verified": false,
+    "notes": "SAME selector as ERC-20 Transfer (both named 'Transfer'). ERC-721 uses OpenZeppelin Cairo layout: all fields marked #[key], so from/to/token_id are all in keys[], data[] is empty. Confirmed from OZ Cairo contracts source. Distinguish from ERC-20 Transfer by: (a) contract address, or (b) cardinality(keys) >= 5 for ERC-721 vs cardinality(data) >= 4 for ERC-20."
+  },
+  {
+    "selector": "0x0134692b230b9e1ffa39098904722134159652b09c5bc41d88d6698779d228ff",
+    "event_name": "Approval",
+    "protocol": "ERC-20",
+    "contract_addresses": [],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "owner", "type": "ContractAddress" },
+      { "index": 2, "name": "spender", "type": "ContractAddress" },
+      { "index": 3, "name": "amount_low", "type": "u128" },
+      { "index": 4, "name": "amount_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector confirmed empirically on Nostra nToken contracts (task 2.4: 133K events/30d). avg_data=2 observed (owner+spender, amount stored differently in Nostra). Data layout inferred by analogy with Transfer event (same OZ Cairo ERC-20 implementation style)."
+  },
+  {
+    "selector": "0x0006ad9ed7b6318f1bcffefe19df9aeb40d22c36bed567e1925a5ccde0536edd",
+    "event_name": "ApprovalForAll",
+    "protocol": "ERC-721",
+    "contract_addresses": [],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" },
+      { "index": 2, "name": "owner", "type": "ContractAddress" },
+      { "index": 3, "name": "operator", "type": "ContractAddress" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "approved", "type": "bool" }
+    ],
+    "verified": false,
+    "notes": "Selector computed via sn_keccak('ApprovalForAll'). Layout inferred from ERC-721 standard: owner and operator are typically indexed, approved is a bool in data[]. Needs ABI verification."
+  },
+  {
+    "selector": "0x00e316f0d9d2a3affa97de1d99bb2aac0538e2666d0d8545545ead241ef0ccab",
+    "event_name": "Swap",
+    "protocol": "AVNU",
+    "contract_addresses": [
+      "0x04270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "taker_address", "type": "ContractAddress" },
+      { "index": 2, "name": "sell_address", "type": "ContractAddress" },
+      { "index": 3, "name": "sell_amount_low", "type": "u128" },
+      { "index": 4, "name": "sell_amount_high", "type": "u128" },
+      { "index": 5, "name": "buy_address", "type": "ContractAddress" },
+      { "index": 6, "name": "buy_amount_low", "type": "u128" },
+      { "index": 7, "name": "buy_amount_high", "type": "u128" },
+      { "index": 8, "name": "beneficiary", "type": "ContractAddress" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): 15,271 events in 7 days on AVNU Exchange Router. Layout sourced from avnu-labs/avnu-contracts-v2 GitHub (struct Swap: taker_address, sell_address, sell_amount: u256, buy_address, buy_amount: u256, beneficiary). No fields are #[key]. u256 values serialize as two felts (low, high). Contract: AVNU Exchange Router."
+  },
+  {
+    "selector": "0x0157717768aca88da4ac4279765f09f4d0151823d573537fbbeb950cdbd9a870",
+    "event_name": "Swapped",
+    "protocol": "Ekubo",
+    "contract_addresses": [
+      "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "locker", "type": "ContractAddress" },
+      { "index": 2, "name": "pool_key_token0", "type": "ContractAddress" },
+      { "index": 3, "name": "pool_key_token1", "type": "ContractAddress" },
+      { "index": 4, "name": "pool_key_fee_low", "type": "u128" },
+      { "index": 5, "name": "pool_key_fee_high", "type": "u128" },
+      { "index": 6, "name": "pool_key_tick_spacing_low", "type": "u128" },
+      { "index": 7, "name": "pool_key_tick_spacing_high", "type": "u128" },
+      { "index": 8, "name": "pool_key_extension", "type": "ContractAddress" },
+      { "index": 9, "name": "params_amount_low", "type": "u128" },
+      { "index": 10, "name": "params_amount_high", "type": "u128" },
+      { "index": 11, "name": "params_is_token1", "type": "bool" },
+      { "index": 12, "name": "params_sqrt_ratio_limit_low", "type": "u128" },
+      { "index": 13, "name": "params_sqrt_ratio_limit_high", "type": "u128" },
+      { "index": 14, "name": "params_skip_ahead_low", "type": "u128" },
+      { "index": 15, "name": "params_skip_ahead_high", "type": "u128" },
+      { "index": 16, "name": "delta_amount0_low", "type": "u128" },
+      { "index": 17, "name": "delta_amount0_high", "type": "u128" },
+      { "index": 18, "name": "delta_amount1_low", "type": "u128" },
+      { "index": 19, "name": "delta_amount1_high", "type": "u128" },
+      { "index": 20, "name": "sqrt_ratio_after_low", "type": "u128" },
+      { "index": 21, "name": "sqrt_ratio_after_high", "type": "u128" },
+      { "index": 22, "name": "tick_after_low", "type": "u128" },
+      { "index": 23, "name": "tick_after_high", "type": "u128" },
+      { "index": 24, "name": "liquidity_after_low", "type": "u128" },
+      { "index": 25, "name": "liquidity_after_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): 767,526 events/30d on Ekubo core. NOTE: previous contract addresses (0x02a6f5..., 0x05776...) were WRONG — the real Ekubo core contract is a short address 0x00000005dd... Ekubo event is named 'Swapped', NOT 'SwapExecuted'. Layout sourced from EkuboProtocol/starknet-contracts GitHub. No fields are #[key]. Nested structs flatten to individual felts. Use data[16..19] for delta amounts."
+  },
+  {
+    "selector": "0x03a7adca3546c213ce791fabf3b04090c163e419c808c9830fb343a4a395946e",
+    "event_name": "PositionUpdated",
+    "protocol": "Ekubo",
+    "contract_addresses": [
+      "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "locker", "type": "ContractAddress" },
+      { "index": 2, "name": "pool_key_token0", "type": "ContractAddress" },
+      { "index": 3, "name": "pool_key_token1", "type": "ContractAddress" },
+      { "index": 4, "name": "pool_key_fee_low", "type": "u128" },
+      { "index": 5, "name": "pool_key_fee_high", "type": "u128" },
+      { "index": 6, "name": "pool_key_tick_spacing_low", "type": "u128" },
+      { "index": 7, "name": "pool_key_tick_spacing_high", "type": "u128" },
+      { "index": 8, "name": "pool_key_extension", "type": "ContractAddress" },
+      { "index": 9, "name": "params_salt", "type": "felt252" },
+      { "index": 10, "name": "params_bounds_lower_low", "type": "u128" },
+      { "index": 11, "name": "params_bounds_lower_high", "type": "u128" },
+      { "index": 12, "name": "params_bounds_upper_low", "type": "u128" },
+      { "index": 13, "name": "params_bounds_upper_high", "type": "u128" },
+      { "index": 14, "name": "params_liquidity_delta_low", "type": "u128" },
+      { "index": 15, "name": "params_liquidity_delta_high", "type": "u128" },
+      { "index": 16, "name": "delta_amount0_low", "type": "u128" },
+      { "index": 17, "name": "delta_amount0_high", "type": "u128" },
+      { "index": 18, "name": "delta_amount1_low", "type": "u128" },
+      { "index": 19, "name": "delta_amount1_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): 9,706 events/30d on Ekubo core 0x00000005dd... Layout sourced from EkuboProtocol/starknet-contracts GitHub. No fields are #[key]. This event covers both add-liquidity (positive liquidity_delta) and remove-liquidity (negative liquidity_delta). delta_amount0/1 are i129 (signed), stored as two u128 felts."
+  },
+  {
+    "selector": "0x025ccf80ee62b2ca9b97c76ccea317c7f450fd6efb6ed6ea56da21d7bb9da5f1",
+    "event_name": "PoolInitialized",
+    "protocol": "Ekubo",
+    "contract_addresses": [
+      "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "pool_key_token0", "type": "ContractAddress" },
+      { "index": 2, "name": "pool_key_token1", "type": "ContractAddress" },
+      { "index": 3, "name": "pool_key_fee_low", "type": "u128" },
+      { "index": 4, "name": "pool_key_fee_high", "type": "u128" },
+      { "index": 5, "name": "pool_key_tick_spacing_low", "type": "u128" },
+      { "index": 6, "name": "pool_key_tick_spacing_high", "type": "u128" },
+      { "index": 7, "name": "pool_key_extension", "type": "ContractAddress" },
+      { "index": 8, "name": "initial_tick_low", "type": "u128" },
+      { "index": 9, "name": "initial_tick_high", "type": "u128" },
+      { "index": 10, "name": "sqrt_ratio_low", "type": "u128" },
+      { "index": 11, "name": "sqrt_ratio_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): 32 events/30d on Ekubo core 0x00000005dd... Layout sourced from EkuboProtocol/starknet-contracts GitHub. No fields are #[key]."
+  },
+  {
+    "selector": "0x034e55c1cd55f1338241b50d352f0e91c7e4ffad0e4271d64eb347589ebdfd16",
+    "event_name": "Mint",
+    "protocol": "JediSwap-V2",
+    "contract_addresses": [],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "sender", "type": "ContractAddress" },
+      { "index": 2, "name": "owner", "type": "ContractAddress" },
+      { "index": 3, "name": "tick_lower", "type": "i32" },
+      { "index": 4, "name": "tick_upper", "type": "i32" },
+      { "index": 5, "name": "amount_low", "type": "u128" },
+      { "index": 6, "name": "amount_high", "type": "u128" },
+      { "index": 7, "name": "amount0_low", "type": "u128" },
+      { "index": 8, "name": "amount0_high", "type": "u128" },
+      { "index": 9, "name": "amount1_low", "type": "u128" },
+      { "index": 10, "name": "amount1_high", "type": "u128" }
+    ],
+    "verified": false,
+    "notes": "WARNING (task 2.4): empirical check of JediSwap V2 pool 0x01114c71... showed NO events with this selector. The pool emits 0x033b678d8846a558f55fc9257950e74c1aac32ee4c836c3a620d1066cc8d493f for what appears to be the add-liquidity event (avg 10 data fields, 297 events/30d). This Mint selector may be WRONG — needs ABI verification on Voyager/Starkscan. Do not use in production queries without verifying."
+  },
+  {
+    "selector": "0x0243e1de00e8a6bc1dfa3e950e6ade24c52e4a25de4dee7fb5affe918ad1e744",
+    "event_name": "Burn",
+    "protocol": "JediSwap-V2",
+    "contract_addresses": [],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "owner", "type": "ContractAddress" },
+      { "index": 2, "name": "tick_lower", "type": "i32" },
+      { "index": 3, "name": "tick_upper", "type": "i32" },
+      { "index": 4, "name": "amount_low", "type": "u128" },
+      { "index": 5, "name": "amount_high", "type": "u128" },
+      { "index": 6, "name": "amount0_low", "type": "u128" },
+      { "index": 7, "name": "amount0_high", "type": "u128" },
+      { "index": 8, "name": "amount1_low", "type": "u128" },
+      { "index": 9, "name": "amount1_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): 305 events/30d on JediSwap V2 pool 0x01114c71... avg_data=12. Layout sourced from jediswaplabs/JediSwap-v2-core GitHub. Emitted when liquidity is removed. No fields are #[key]."
+  },
+  {
+    "selector": "0x00e316f0d9d2a3affa97de1d99bb2aac0538e2666d0d8545545ead241ef0ccab",
+    "event_name": "Swap",
+    "protocol": "JediSwap-V2",
+    "contract_addresses": [],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "sender", "type": "ContractAddress" },
+      { "index": 2, "name": "recipient", "type": "ContractAddress" },
+      { "index": 3, "name": "amount0_low", "type": "u128" },
+      { "index": 4, "name": "amount0_high", "type": "u128" },
+      { "index": 5, "name": "amount1_low", "type": "u128" },
+      { "index": 6, "name": "amount1_high", "type": "u128" },
+      { "index": 7, "name": "sqrt_price_x96_low", "type": "u128" },
+      { "index": 8, "name": "sqrt_price_x96_high", "type": "u128" },
+      { "index": 9, "name": "liquidity_low", "type": "u128" },
+      { "index": 10, "name": "liquidity_high", "type": "u128" },
+      { "index": 11, "name": "tick", "type": "i32" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): 41,693 events/30d on JediSwap V2 pool 0x01114c71..., avg_data=16. Layout sourced from jediswaplabs/JediSwap-v2-core GitHub. SAME selector as AVNU Swap — distinguish by from_address. amount0/1 are i256, serialized as two u128 felts (signed). JediSwap V2 pools found: 0x01114c71... (highest volume), 0x020d2431..., 0x068400056..."
+  },
+  {
+    "selector": "0x0374396cb322ab5ffd35ddb8627514609289d22c07d039ead5327782f61bb833",
+    "event_name": "DepositHandled",
+    "protocol": "StarkGate",
+    "contract_addresses": [
+      "0x073314940630fd6dcda0d772d4c972c4e0a9946bef9dabf4ef84eda8ef542b82",
+      "0x0594c1582459ea03f77deaf9eb7e3917d6994a03c13405ba42867f83d85f085d",
+      "0x05cd48fccbfd8aa2773fe22c217e808319ffcc1c5a6a463f7d8fa2da48218196",
+      "0x074761a8d48ce002963002becc6d9c3dd8a2a05b1075d55e5967f42296f16bd0",
+      "0x07aeec4870975311a7396069033796b61cd66ed49d22a786cba12a8d76717302"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "account", "type": "ContractAddress" },
+      { "index": 2, "name": "amount_low", "type": "u128" },
+      { "index": 3, "name": "amount_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically on Dune against ETH L2 bridge contract (sn_keccak matches 'DepositHandled'). Emitted on Starknet L2 when an L1→L2 bridge deposit is processed. ~10 events/day on the ETH bridge. Contract addresses include: ETH bridge, STRK bridge, USDC bridge, USDT bridge, WBTC bridge. Data layout INFERRED — needs ABI verification on Starkscan/Voyager."
+  },
+  {
+    "selector": "0x0282f521c69b2bc696552b9e141009d3c84f2df75e2e7b7716644d31e60f23b1",
+    "event_name": "WithdrawInitiated",
+    "protocol": "StarkGate",
+    "contract_addresses": [
+      "0x073314940630fd6dcda0d772d4c972c4e0a9946bef9dabf4ef84eda8ef542b82",
+      "0x0594c1582459ea03f77deaf9eb7e3917d6994a03c13405ba42867f83d85f085d",
+      "0x05cd48fccbfd8aa2773fe22c217e808319ffcc1c5a6a463f7d8fa2da48218196",
+      "0x074761a8d48ce002963002becc6d9c3dd8a2a05b1075d55e5967f42296f16bd0",
+      "0x07aeec4870975311a7396069033796b61cd66ed49d22a786cba12a8d76717302"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "l1_recipient", "type": "felt252" },
+      { "index": 2, "name": "amount_low", "type": "u128" },
+      { "index": 3, "name": "amount_high", "type": "u128" },
+      { "index": 4, "name": "caller_address", "type": "ContractAddress" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically on Dune against ETH L2 bridge contract (sn_keccak matches 'WithdrawInitiated'). Emitted when user initiates L2→L1 withdrawal. ~10 events/day. Data layout INFERRED — needs ABI verification."
+  },
+  {
+    "selector": "0x0194fc63c49b0f07c8e7a78476844837255213824bd6cb81e0ccfb949921aad1",
+    "event_name": "withdraw_initiated",
+    "protocol": "StarkGate",
+    "contract_addresses": [
+      "0x073314940630fd6dcda0d772d4c972c4e0a9946bef9dabf4ef84eda8ef542b82"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [],
+    "verified": true,
+    "notes": "Selector VERIFIED: sn_keccak('withdraw_initiated') matches this empirically observed value from Dune. This is the snake_case variant — likely an older StarkGate contract version or message event. Emits very rarely (~1/day or less). Distinct from 'WithdrawInitiated' (CamelCase). Data layout unknown."
+  },
+  {
+    "selector": "0x009149d2123147c5f43d258257fef0b7b969db78269369ebcf5ebb9eef8592f2",
+    "event_name": "Deposit",
+    "protocol": "Nostra",
+    "contract_addresses": [
+      "0x062da0780fae50d68cecaa5a051606dc21217ba290969b302db4dd99d2e9b470",
+      "0x062e091dca6016fe01d94f3b2e12eac8b1a9256db2cbba8e7995a366867450ad",
+      "0x06a567e68c805323525fe1649adb80b03cddf92c23d2629a6779f54192dffc13",
+      "0x028d709c875c0ceac3dce7065bec5328186dc89fe254527084d1689910954b0a"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "user", "type": "ContractAddress" },
+      { "index": 2, "name": "token", "type": "ContractAddress" },
+      { "index": 3, "name": "face_amount_low", "type": "u128" },
+      { "index": 4, "name": "face_amount_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): ~91K-155K events/30d per Nostra nToken contract. Contract addresses listed are Nostra individual market/nToken contracts (pool-per-token architecture). zkLend Market 0x04c0a519... has been inactive since Feb 2025 — this selector is now primarily a Nostra signal. avg_data=4 observed. Data layout INFERRED — needs ABI verification."
+  },
+  {
+    "selector": "0x017f87ab38a7f75a63dc465e10aadacecfca64c44ca774040b039bfb004e3367",
+    "event_name": "Withdraw",
+    "protocol": "Nostra",
+    "contract_addresses": [
+      "0x062da0780fae50d68cecaa5a051606dc21217ba290969b302db4dd99d2e9b470",
+      "0x062e091dca6016fe01d94f3b2e12eac8b1a9256db2cbba8e7995a366867450ad"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "user", "type": "ContractAddress" },
+      { "index": 2, "name": "token", "type": "ContractAddress" },
+      { "index": 3, "name": "face_amount_low", "type": "u128" },
+      { "index": 4, "name": "face_amount_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): 22-27K events/30d on Nostra nToken contracts. avg_data=4. These are Nostra pool withdrawal events. Data layout INFERRED — needs ABI verification."
+  },
+  {
+    "selector": "0x03e2dfa0d0bbc9b229c88acd70a4e76511e2d12d8821c5955d8b5d57fd4c5944",
+    "event_name": "Borrow",
+    "protocol": "zkLend",
+    "contract_addresses": [
+      "0x04c0a5193d58f74fbace4b74dcf65481e734ed1714121bdc571da345540efa05"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "user", "type": "ContractAddress" },
+      { "index": 2, "name": "token", "type": "ContractAddress" },
+      { "index": 3, "name": "raw_amount_low", "type": "u128" },
+      { "index": 4, "name": "raw_amount_high", "type": "u128" },
+      { "index": 5, "name": "face_amount_low", "type": "u128" },
+      { "index": 6, "name": "face_amount_high", "type": "u128" }
+    ],
+    "verified": false,
+    "notes": "WARNING (task 2.4): This selector returned 0 events across all starknet.events in 30 days — the selector is likely WRONG. sn_keccak('Borrow') may produce a different hash. zkLend Market 0x04c0a519... has been inactive since Feb 2025. Nostra borrow events likely use a different selector (observed on Nostra contracts: 0x0320efd552d992294b62e23bcfa29f7703b7b899c22eb04973d36655afd06ddf — 4,446 events/30d, avg 11 data fields — possible Borrow). Do not use without ABI verification."
+  },
+  {
+    "selector": "0x00517f2438845016abdb177ef4740932036bcc1855a547e80e5013636df1aafd",
+    "event_name": "Repay",
+    "protocol": "zkLend",
+    "contract_addresses": [
+      "0x04c0a5193d58f74fbace4b74dcf65481e734ed1714121bdc571da345540efa05"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "repayer", "type": "ContractAddress" },
+      { "index": 2, "name": "beneficiary", "type": "ContractAddress" },
+      { "index": 3, "name": "token", "type": "ContractAddress" },
+      { "index": 4, "name": "raw_amount_low", "type": "u128" },
+      { "index": 5, "name": "raw_amount_high", "type": "u128" },
+      { "index": 6, "name": "face_amount_low", "type": "u128" },
+      { "index": 7, "name": "face_amount_high", "type": "u128" }
+    ],
+    "verified": false,
+    "notes": "Selector computed via sn_keccak('Repay'). Data layout INFERRED. zkLend inactive since Feb 2025. Needs ABI verification before use — confirm against live Nostra contracts on Voyager/Starkscan."
+  },
+  {
+    "selector": "0x030c296ae369716818de77cb5b71ce9cda7cc2c0e8456f474e0abb1ae8d017da",
+    "event_name": "AccumulatorsSync",
+    "protocol": "zkLend",
+    "contract_addresses": [
+      "0x04c0a5193d58f74fbace4b74dcf65481e734ed1714121bdc571da345540efa05"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "token", "type": "ContractAddress" },
+      { "index": 2, "name": "lending_accumulator_low", "type": "u128" },
+      { "index": 3, "name": "lending_accumulator_high", "type": "u128" },
+      { "index": 4, "name": "debt_accumulator_low", "type": "u128" },
+      { "index": 5, "name": "debt_accumulator_high", "type": "u128" }
+    ],
+    "verified": true,
+    "notes": "Selector VERIFIED empirically (task 2.4): 7.3M events total on 0x04c0a519... (zkLend Market V1). Active 2023-05-04 to 2025-02-11 — zkLend is INACTIVE since Feb 2025. Emitted when interest rate accumulators are updated. Useful for historical zkLend rate analysis. Layout INFERRED."
+  },
+  {
+    "selector": "0x003dfe6670b0f4e60f951b8a326e7467613b2470d81881ba2deb540262824f1e",
+    "event_name": "ModifyPosition",
+    "protocol": "Vesu",
+    "contract_addresses": [
+      "0x000d8d6dfec4d33bfb6895de9f3852143a17c6f92fd2a21da3d6924d34870160",
+      "0x03760f903a37948f97302736f89ce30290e45f441559325026842b7a6fb388c0"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "pool_id", "type": "felt252" },
+      { "index": 2, "name": "collateral_asset", "type": "ContractAddress" },
+      { "index": 3, "name": "debt_asset", "type": "ContractAddress" },
+      { "index": 4, "name": "user", "type": "ContractAddress" }
+    ],
+    "verified": false,
+    "notes": "Selector computed via sn_keccak('ModifyPosition'). Vesu's main position event. Layout INFERRED from Vesu docs. Needs ABI verification."
+  },
+  {
+    "selector": "0x034e55c1cd55f1338241b50d352f0e91c7e4ffad0e4271d64eb347589ebdfd16",
+    "event_name": "Mint",
+    "protocol": "Nostra",
+    "contract_addresses": [
+      "0x02a93ef8c7679a5f9b1fcf7286a6e1cadf2e9192be4bcb5cb2d1b39062697527"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [
+      { "index": 1, "name": "caller", "type": "ContractAddress" },
+      { "index": 2, "name": "on_behalf_of", "type": "ContractAddress" },
+      { "index": 3, "name": "amount_low", "type": "u128" },
+      { "index": 4, "name": "amount_high", "type": "u128" }
+    ],
+    "verified": false,
+    "notes": "Selector computed via sn_keccak('Mint'). SAME selector as JediSwap V2 Mint (0x034e55c1...) — but CAUTION: empirical check of JediSwap V2 pool showed a DIFFERENT add-liquidity selector in practice. This selector may not be correct for either Nostra or JediSwap V2. Needs ABI verification. Nostra uses a pool-per-token architecture."
+  },
+  {
+    "selector": "0x033b678d8846a558f55fc9257950e74c1aac32ee4c836c3a620d1066cc8d493f",
+    "event_name": "UNKNOWN_ADD_LIQUIDITY",
+    "protocol": "JediSwap-V2",
+    "contract_addresses": [
+      "0x01114c7103e12c2b2ecbd3a2472ba9c48ddcbf702b1c242dd570057e26212111"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [],
+    "verified": true,
+    "notes": "Observed empirically (task 2.4): 297 events/30d on JediSwap V2 pool, avg 10 data fields. This is the add-liquidity event on JediSwap V2 pools — the selector 0x034e55c1... (Mint) was NOT observed on this pool. Event name is unknown — needs ABI verification on Voyager/Starkscan to identify the actual Cairo event name."
+  },
+  {
+    "selector": "0x0305c746d1cf87085ae1abfe05967daa50048146e50e03fa41f7e41a91ee323d",
+    "event_name": "UNKNOWN_EKUBO_1",
+    "protocol": "Ekubo",
+    "contract_addresses": [
+      "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [],
+    "verified": true,
+    "notes": "Observed empirically (task 2.4): ~65K events/30d on Ekubo core, avg_keys=1, avg_data=4. Paired with 0x0048796a25... (similar volume). Likely fee-related events (FeesCollected or similar). Needs ABI verification."
+  },
+  {
+    "selector": "0x0048796a25e5ceac9caf95a4618ebfd1516b51e5d994a49d28e22f09c64ad2ee",
+    "event_name": "UNKNOWN_EKUBO_2",
+    "protocol": "Ekubo",
+    "contract_addresses": [
+      "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [],
+    "verified": true,
+    "notes": "Observed empirically (task 2.4): ~65K events/30d on Ekubo core, avg_keys=1, avg_data=4. Paired with 0x0305c746d1... (similar volume). Likely fee-related events. Needs ABI verification."
+  },
+  {
+    "selector": "0x0096982abd597114bdaa4a60612f87fabfcc7206aa12d61c50e7ba1e6c291100",
+    "event_name": "UNKNOWN_EKUBO_3",
+    "protocol": "Ekubo",
+    "contract_addresses": [
+      "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [],
+    "verified": true,
+    "notes": "Observed empirically (task 2.4): ~8K events/30d on Ekubo core, avg_keys=1, avg_data=15. Paired with 0x005dacf597... (similar volume, similar data length). Large event with 15 data fields — possibly a complex position/protocol event. Needs ABI verification."
+  },
+  {
+    "selector": "0x005dacf59794364ad1555bb3c9b2346afa81e57e5c19bb6bae0d22721c96c4e5",
+    "event_name": "UNKNOWN_EKUBO_4",
+    "protocol": "Ekubo",
+    "contract_addresses": [
+      "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b"
+    ],
+    "keys_layout": [
+      { "index": 1, "name": "selector", "type": "felt252" }
+    ],
+    "data_layout": [],
+    "verified": true,
+    "notes": "Observed empirically (task 2.4): ~7K events/30d on Ekubo core, avg_keys=1, avg_data=15. Paired with 0x0096982abd... (similar volume, similar data length). Needs ABI verification."
+  }
+]
