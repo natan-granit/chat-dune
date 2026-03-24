@@ -26,7 +26,7 @@
 - Use `supabase/config.toml` for local Supabase config (via the Supabase CLI)
 - `docker-compose.yml` should pull the official Supabase self-hosted images
 - `make db-types` calls `supabase gen types typescript --local > frontend/src/lib/db/types.ts`
-- `.env.example` should include: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `DUNE_API_KEY`, `STARKNET_RPC_URL`
+- `.env.example` should include: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`, `GOOGLE_APPLICATION_CREDENTIALS`, `DUNE_API_KEY`, `STARKNET_RPC_URL`
 
 ---
 
@@ -37,7 +37,7 @@
 **Requirements**:
 - [x] Run `npx create-next-app@latest frontend --typescript --tailwind --app --src-dir --eslint`
 - [x] Install core dependencies:
-  - `@anthropic-ai/sdk`, `ai` (Vercel AI SDK)
+  - `@ai-sdk/google-vertex`, `ai` (Vercel AI SDK)
   - `@supabase/supabase-js`, `@supabase/ssr`
   - `@tanstack/react-query`
   - `recharts`, `echarts`, `echarts-for-react`
@@ -107,12 +107,12 @@
 **Description**: Map exactly what the Dune MCP integration exposes, its query limitations, rate limits, and authentication model. Produce a reference document for the engineering phase.
 
 **Requirements**:
-- [ ] Set up Dune API key and test MCP integration locally
-- [ ] Document all available MCP tools/capabilities exposed by the Dune MCP server
-- [ ] Test Dune's Starknet table coverage: what tables exist, what data is available, how fresh
-- [ ] Test query execution latency for typical blockchain analytics queries
-- [ ] Identify limitations: max result size, timeout behavior, unsupported query types
-- [ ] Produce `research/dune-mcp.md` with findings and recommended query patterns
+- [x] Set up Dune API key and test MCP integration locally
+- [x] Document all available MCP tools/capabilities exposed by the Dune MCP server
+- [x] Test Dune's Starknet table coverage: what tables exist, what data is available, how fresh
+- [x] Test query execution latency for typical blockchain analytics queries
+- [x] Identify limitations: max result size, timeout behavior, unsupported query types
+- [x] Produce `research/dune-mcp.md` with findings and recommended query patterns
 
 **Implementation Notes**:
 - Reference Dune's official MCP documentation and GitHub repo (search `dune-analytics/mcp`)
@@ -140,22 +140,43 @@
 
 ---
 
-### 2.3 Claude Tool Use Strategy for Blockchain Analytics
+### 2.3 Gemini Tool Use Strategy for Blockchain Analytics
 
-**Description**: Prototype the Claude tool call loop for blockchain analytics queries. Determine the optimal system prompt structure, tool definitions, and multi-step reasoning patterns.
+**Description**: Prototype the Gemini function-calling loop for blockchain analytics queries via Vertex AI. Determine the optimal system prompt structure, function definitions, and multi-step reasoning patterns.
 
 **Requirements**:
-- [ ] Build a minimal standalone script (`research/claude-tool-prototype.ts`) that runs a tool call loop
+- [ ] Build a minimal standalone script (`research/gemini-tool-prototype.ts`) that runs a function-calling loop via `@ai-sdk/google-vertex`
 - [ ] Test with 5–10 representative blockchain queries from the examples in SPEC.md
-- [ ] Evaluate: does Claude pick the right tool? Does it produce valid DuneSQL? Does it recover from errors?
+- [ ] Evaluate: does Gemini pick the right tool? Does it produce valid DuneSQL? Does it recover from errors?
 - [ ] Test iterative refinement: user follow-up questions staying in context, chart modifications
-- [ ] Produce `research/claude-strategy.md` with recommended system prompt, tool schemas, and failure handling patterns
+- [ ] Produce `research/gemini-strategy.md` with recommended system prompt, tool schemas, and failure handling patterns
 
 **Implementation Notes**:
-- Use the Anthropic SDK directly (no Vercel AI SDK) for the prototype to reduce abstraction
+- Use `@ai-sdk/google-vertex` with the Vercel AI SDK `generateText` (non-streaming) for the prototype to reduce abstraction
+- Authenticate via Application Default Credentials (ADC): `gcloud auth application-default login` locally; service account JSON in production
 - Instrument token usage per query to estimate costs at scale
-- Focus especially on address mapping injection: does Claude effectively use address labels when they're provided in context?
-- Test the chart spec output schema — confirm Claude reliably produces valid Zod-parseable chart specs
+- Focus especially on address mapping injection: does Gemini effectively use address labels when they're provided in context?
+- Test the chart spec output schema — confirm Gemini reliably produces valid Zod-parseable chart specs
+- Recommended model: `gemini-2.0-flash` for speed/cost balance; `gemini-1.5-pro` as fallback for complex multi-step queries
+
+---
+
+### 2.4 Starknet Event Selector Registry
+
+**Description**: Catalog Starknet Poseidon event selectors for known protocols and build a reference that will be injected into the system prompt and stored in Supabase, compensating for Dune's lack of decoded Starknet tables.
+
+**Requirements**:
+- [ ] Catalog event selectors (Poseidon hashes) for key Starknet token standards: ERC-20 `Transfer`, `Approval`; ERC-721 `Transfer`; ERC-4626 `Deposit`/`Withdraw`
+- [ ] Catalog selectors for major Starknet protocols: JediSwap, AVNU, Ekubo (Swap, Mint, Burn events), Nostra (supply/borrow events), StarkGate bridge events
+- [ ] For each selector, document: event name, emitting contracts, `keys[]` parameter layout, `data[]` parameter layout, and a sample DuneSQL snippet
+- [ ] Produce `research/starknet-selectors.md` as a human-readable reference
+- [ ] Produce `research/starknet-selectors.json` as a machine-readable registry (to seed the DB in task 3.1)
+
+**Implementation Notes**:
+- Poseidon selectors can be derived from the Cairo ABI or verified on Starkscan/Voyager by inspecting known transactions
+- Priority order: ERC-20 Transfer (highest volume), DEX Swap events, bridge events, lending events
+- The JSON format should match the `starknet_selectors` DB table schema from task 3.1: `{ selector, event_name, contract_addresses[], keys_layout[], data_layout[] }`
+- This registry is what enables the LLM to write correct raw `starknet.events` queries without guessing array indices
 
 ---
 
@@ -169,6 +190,7 @@
 - [ ] Create migration: `threads` table (id, user_id, title, is_pinned, timestamps)
 - [ ] Create migration: `messages` table (id, thread_id, role, content jsonb, timestamps)
 - [ ] Create migration: `address_mappings` table (id, workspace, address, chain, name, entity, category, tags[], created_by, timestamps)
+- [ ] Create migration: `starknet_selectors` table (id, selector, event_name, contract_addresses text[], keys_layout jsonb, data_layout jsonb, protocol, created_at) — seeded from `research/starknet-selectors.json`
 - [ ] Implement RLS policies:
   - `threads`: user can only read/write their own threads
   - `messages`: user can only read/write messages in their own threads
@@ -203,34 +225,38 @@
 
 ---
 
-### 3.3 Chat Engine — Claude Integration
+### 3.3 Chat Engine — Gemini Integration
 
-**Description**: Implement the core Claude streaming chat loop with tool use. This is the intelligence layer of the entire application.
+**Description**: Implement the core Gemini streaming chat loop with function calling via Vertex AI. This is the intelligence layer of the entire application.
 
 **Requirements**:
-- [ ] Define Claude tool schemas (Zod + Anthropic tool definitions):
+- [ ] Define Gemini function schemas (Zod + Vercel AI SDK tool definitions):
   - `execute_dune_query(sql: string, description: string)` → returns rows + column names
   - `render_chart(spec: ChartSpec)` → signals frontend to render a chart
   - `lookup_address_mappings(addresses: string[])` → returns label data for known addresses
   - `fetch_rpc_data(method: string, params: unknown[], chain: string)` → calls Starknet RPC
-- [ ] Implement `POST /api/chat` route handler with streaming via Vercel AI SDK
-- [ ] Implement the tool call loop: send → receive tool_use → execute tool → send tool_result → repeat
+- [ ] Implement `POST /api/chat` route handler with streaming via Vercel AI SDK + `@ai-sdk/google-vertex`
+- [ ] Implement the function call loop: send → receive function_call → execute → send function_response → repeat
 - [ ] Inject workspace address mappings into the system prompt at request time
+- [ ] Inject the Starknet event selector registry (from `starknet_selectors` table) into the system prompt
 - [ ] Implement system prompt in `lib/chat/system-prompt.ts` covering:
   - Role definition: Starknet blockchain analytics copilot
   - Available Dune table namespaces for Starknet
+  - Starknet event selector map (keys[]/data[] layouts for known protocols)
   - Chart spec format (exact JSON schema)
   - Rules: prefer Dune, fall back to RPC for real-time data, never expose SQL unless asked
   - Address mapping context (injected dynamically)
 - [ ] Persist messages (user + assistant) to Supabase after each exchange
-- [ ] Handle tool execution errors gracefully (feed error message back to Claude for recovery)
+- [ ] Handle tool execution errors gracefully (feed error message back to Gemini for recovery)
 
 **Implementation Notes**:
-- Use Vercel AI SDK's `streamText` with Anthropic provider for streaming
-- The `render_chart` tool is a pseudo-tool — Claude calls it as a signal; the server doesn't execute it, just passes the spec to the client via the stream
+- Use Vercel AI SDK's `streamText` with `createVertex()` from `@ai-sdk/google-vertex` provider
+- Auth: set `GOOGLE_CLOUD_PROJECT` + `GOOGLE_CLOUD_LOCATION` env vars; use ADC locally (`gcloud auth application-default login`), service account JSON in production via `GOOGLE_APPLICATION_CREDENTIALS`
+- Model: `gemini-2.0-flash` as default; configurable via `GEMINI_MODEL` env var
+- The `render_chart` tool is a pseudo-tool — Gemini calls it as a signal; the server passes the spec to the client via the stream
 - Stream two types of events: `text-delta` (explanation text) and `chart-spec` (structured chart data)
-- Keep a tool execution timeout of 30s for Dune queries; surface timeout errors to Claude for retry or fallback
-- The system prompt should be regenerated per-request to include fresh address mapping data (not cached)
+- Keep a tool execution timeout of 30s for Dune queries; surface timeout errors to Gemini for retry or fallback
+- The system prompt should be regenerated per-request to include fresh address mapping and selector data (not cached)
 
 ---
 

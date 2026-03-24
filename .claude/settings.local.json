@@ -31,7 +31,12 @@
       "Bash(git checkout:*)",
       "Bash(gh pr:*)",
       "Bash(gh run:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.dune.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:dune.com)",
+      "WebFetch(domain:dev.to)"
     ]
   }
 }

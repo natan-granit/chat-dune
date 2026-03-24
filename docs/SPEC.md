@@ -88,7 +88,7 @@
 | Framework | Next.js 14+ (App Router) | Full-stack React with built-in API route handlers; streaming support; Vercel-native |
 | Language | TypeScript | Type safety for complex data models; better DX with Zod and Supabase types |
 | Styling | Tailwind CSS + shadcn/ui | Rapid, consistent UI with accessible primitives |
-| AI | Claude API (claude-sonnet-4-5) via Vercel AI SDK | Best-in-class reasoning for query planning; native tool_use; streaming |
+| AI | Gemini via Google Cloud Vertex AI (`@ai-sdk/google-vertex`) | Strong function-calling and reasoning; Google Cloud managed; streaming via Vercel AI SDK |
 | Data | Dune MCP | First-class AI-native interface to Dune's cross-chain SQL engine |
 | Blockchain RPC | Starknet RPC + Ethereum via Alchemy/Infura | Complementary raw data when Dune is insufficient (real-time, not indexed) |
 | Charts | Recharts (line, bar, pie) + ECharts (Sankey/flow) | Recharts for lightweight standard charts; ECharts for complex flow diagrams |
@@ -259,6 +259,18 @@ created_at  timestamptz DEFAULT now()
 UNIQUE (address, chain)
 ```
 
+### `starknet_selectors`
+```sql
+id                  uuid PRIMARY KEY DEFAULT gen_random_uuid()
+selector            text NOT NULL UNIQUE  -- Poseidon hash e.g. "0x99cd8bde..."
+event_name          text NOT NULL         -- e.g. "Transfer"
+protocol            text                  -- e.g. "ERC-20", "JediSwap"
+contract_addresses  text[]               -- known emitting contracts (empty = any)
+keys_layout         jsonb NOT NULL        -- [{index, name, type}] for keys[1..]
+data_layout         jsonb NOT NULL        -- [{index, name, type}] for data[]
+created_at          timestamptz DEFAULT now()
+```
+
 ### ChartSpec (Zod-validated JSON)
 ```ts
 type ChartSpec = {
@@ -321,9 +333,10 @@ Generates a CSV or PNG export for a given result from a message.
 ### Dune MCP
 The primary data layer. Claude uses the MCP tool interface to run DuneSQL queries against Dune's multi-chain dataset. Authentication via Dune API key. The MCP integration handles query execution, result pagination, and error handling.
 
-### Claude API
-Claude (claude-sonnet-4-5) is the runtime intelligence layer. It is invoked for every user message via the Vercel AI SDK. It uses `tool_use` to coordinate data retrieval and chart spec generation. The system prompt includes:
+### Gemini via Vertex AI
+Gemini (`gemini-2.0-flash` default, configurable) is the runtime intelligence layer. It is invoked for every user message via the Vercel AI SDK with the `@ai-sdk/google-vertex` provider. It uses function calling to coordinate data retrieval and chart spec generation. Authentication uses Google Cloud Application Default Credentials (ADC) locally and a service account JSON in production. The system prompt includes:
 - Supported chains and their Dune table namespaces
+- Starknet event selector registry (Poseidon hashes → parameter layouts for known protocols)
 - Address mapping context for the current workspace
 - Instructions for preferring Dune over RPC, and when to fall back
 - Chart spec format specification
@@ -348,5 +361,6 @@ PostgreSQL database + Auth. Row-Level Security (RLS) policies ensure users can o
 | Chart spec as JSON contract | Zod-validated ChartSpec | Separates AI output (spec) from rendering (React component), making charts safe to render and easy to extend |
 | Address mappings at workspace level | Shared, admin-uploaded | Simplifies access model; all users benefit from shared entity labels without per-user management complexity |
 | Supabase for persistence + auth | Supabase | Managed Postgres with built-in RLS, auth, and type generation — avoids running a custom auth server |
+| Gemini over Claude | Vertex AI | Google Cloud managed inference; Gemini's function calling is well-suited for structured tool loops; preferred cloud provider |
 | Starknet-first MVP | Starknet only | Scoped for relevance to a Starknet-focused infra company; avoids dual-chain complexity in early phases |
 | Thread-as-dashboard | Pin a thread | Simplest dashboard model — no separate builder needed; pinned threads become persistent views |
