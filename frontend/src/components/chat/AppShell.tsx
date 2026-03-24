@@ -9,10 +9,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-full min-h-screen bg-[var(--cd-background)]">
-      <ThreadSidebar
-        collapsed={collapsed}
-        onToggle={() => setCollapsed((c) => !c)}
-      />
+      <ThreadSidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
       <main
         style={{ marginLeft: sidebarWidth }}
         className="flex flex-1 flex-col transition-[margin-left] duration-[250ms] ease-in-out"
