@@ -88,9 +88,9 @@
 **Description**: Automated checks on every pull request and merge to main: typecheck, lint, and format validation.
 
 **Requirements**:
-- [ ] Create `.github/workflows/ci.yml` running on push and PR to main
-- [ ] CI steps: `npm ci`, `npm run typecheck`, `npm run lint`, `npm run format:check`
-- [ ] Add `typecheck`, `lint`, `format:check`, `format` scripts to `frontend/package.json`
+- [x] Create `.github/workflows/ci.yml` running on push and PR to main
+- [x] CI steps: `npm ci`, `npm run typecheck`, `npm run lint`, `npm run format:check`
+- [x] Add `typecheck`, `lint`, `format:check`, `format` scripts to `frontend/package.json`
 - [ ] Configure branch protection on `main` requiring CI to pass before merge
 
 **Implementation Notes**:
