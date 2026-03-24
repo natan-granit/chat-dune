@@ -330,7 +330,7 @@ SELECT
 FROM starknet.events
 WHERE
   from_address = 0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d  -- STRK token
-  AND keys[1] = 0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9  -- Transfer selector
+  AND keys[1] = 0x0099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9  -- Transfer selector
   AND block_date >= current_date - INTERVAL '7' DAY
 ORDER BY block_date DESC
 LIMIT 100;

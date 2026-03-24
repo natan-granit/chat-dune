@@ -127,11 +127,11 @@
 **Description**: Understand the Starknet-specific data available in Dune — table names, event schemas, known protocol contracts — to inform the system prompt and query planning strategy.
 
 **Requirements**:
-- [ ] Map all Starknet-related tables in Dune (e.g., `starknet.transactions`, `starknet.events`, token tables)
-- [ ] Document the schema for key tables (columns, data types, event signatures)
-- [ ] Identify gaps where Dune lacks Starknet data and RPC must be used instead
-- [ ] Catalog known Starknet protocol contract addresses (major DEXes, lending protocols, bridges)
-- [ ] Produce `research/starknet-dune.md` with table reference and gap analysis
+- [x] Map all Starknet-related tables in Dune (e.g., `starknet.transactions`, `starknet.events`, token tables)
+- [x] Document the schema for key tables (columns, data types, event signatures)
+- [x] Identify gaps where Dune lacks Starknet data and RPC must be used instead
+- [x] Catalog known Starknet protocol contract addresses (major DEXes, lending protocols, bridges)
+- [x] Produce `research/starknet-dune.md` with table reference and gap analysis
 
 **Implementation Notes**:
 - Use the Dune query editor directly to explore Starknet schema: `SELECT * FROM information_schema.tables WHERE table_schema LIKE '%starknet%'`
