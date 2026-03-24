@@ -64,17 +64,17 @@
 **Description**: Create route stubs for all application pages with placeholder content and the global authenticated layout (sidebar + nav).
 
 **Requirements**:
-- [ ] Create auth layout: `app/(auth)/layout.tsx` — centered card layout, no sidebar
-- [ ] Create app layout: `app/(app)/layout.tsx` — sidebar + main content area
-- [ ] Create page stubs with "X Page Coming Soon" text:
+- [x] Create auth layout: `app/(auth)/layout.tsx` — centered card layout, no sidebar
+- [x] Create app layout: `app/(app)/layout.tsx` — sidebar + main content area
+- [x] Create page stubs with "X Page Coming Soon" text:
   - `app/(auth)/login/page.tsx` — Login page stub
   - `app/(app)/chat/page.tsx` — New Chat landing stub
   - `app/(app)/chat/[threadId]/page.tsx` — Chat thread stub
   - `app/(app)/dashboards/page.tsx` — Saved Dashboards stub
   - `app/(app)/mappings/page.tsx` — Address Mappings stub
-- [ ] Implement `ThreadSidebar` component with hardcoded mock thread list
-- [ ] Set up global CSS variables for design tokens from `STYLES.md` in `globals.css`
-- [ ] Set up TanStack Query provider in the root layout
+- [x] Implement `ThreadSidebar` component with hardcoded mock thread list
+- [x] Set up global CSS variables for design tokens from `STYLES.md` in `globals.css`
+- [x] Set up TanStack Query provider in the root layout
 
 **Implementation Notes**:
 - Sidebar should already implement the collapse interaction (icon-only mode at 52px) even in stub form
