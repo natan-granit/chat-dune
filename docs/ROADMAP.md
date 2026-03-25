@@ -194,17 +194,17 @@
 **Description**: Define and migrate the full Supabase database schema for threads, messages, and address mappings. Includes Row-Level Security policies.
 
 **Requirements**:
-- [ ] Create migration: `threads` table (id, user_id, title, is_pinned, timestamps)
-- [ ] Create migration: `messages` table (id, thread_id, role, content jsonb, timestamps)
-- [ ] Create migration: `address_mappings` table (id, workspace, address, chain, name, entity, category, tags[], created_by, timestamps)
-- [ ] Create migration: `starknet_selectors` table (id, selector, event_name, contract_addresses text[], keys_layout jsonb, data_layout jsonb, protocol, created_at) — seeded from `research/starknet-selectors.json`
-- [ ] Implement RLS policies:
+- [x] Create migration: `threads` table (id, user_id, title, is_pinned, timestamps)
+- [x] Create migration: `messages` table (id, thread_id, role, content jsonb, timestamps)
+- [x] Create migration: `address_mappings` table (id, workspace, address, chain, name, entity, category, tags[], created_by, timestamps)
+- [x] Create migration: `starknet_selectors` table (id, selector, event_name, contract_addresses text[], keys_layout jsonb, data_layout jsonb, protocol, created_at) — seeded from `research/starknet-selectors.json`
+- [x] Implement RLS policies:
   - `threads`: user can only read/write their own threads
   - `messages`: user can only read/write messages in their own threads
   - `address_mappings`: all authenticated users can read workspace mappings; only admins can write
-- [ ] Create indexes: `messages(thread_id)`, `address_mappings(address, chain)`, `threads(user_id, updated_at DESC)`
-- [ ] Create `supabase/seed.sql` with dev seed data (sample threads, messages, address mappings) — seed `address_mappings` from `research/address-mappings-seed.csv` (399 entries: 180 Starknet contracts from internal resolver v2.1 + 210 staker addresses + 9 delegation pool contracts; pool→validator name mapping to be completed in a future pass)
-- [ ] Generate TypeScript types with `make db-types`
+- [x] Create indexes: `messages(thread_id)`, `address_mappings(address, chain)`, `threads(user_id, updated_at DESC)`
+- [x] Create `supabase/seed.sql` with dev seed data (sample threads, messages, address mappings) — seed `address_mappings` from `research/address-mappings-seed.csv` (399 entries: 180 Starknet contracts from internal resolver v2.1 + 210 staker addresses + 9 delegation pool contracts; pool→validator name mapping to be completed in a future pass)
+- [x] Generate TypeScript types with `make db-types`
 
 **Implementation Notes**:
 - Define `admin` role via a `user_roles` table or a claim in Supabase Auth JWT — keep it simple for now (hardcode admin emails in an env var or a role column on the users table)
