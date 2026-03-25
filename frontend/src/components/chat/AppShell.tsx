@@ -3,7 +3,12 @@
 import { useState } from "react";
 import { ThreadSidebar } from "./ThreadSidebar";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+interface AppShellProps {
+  children: React.ReactNode;
+  userEmail: string | null;
+}
+
+export function AppShell({ children, userEmail }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
   const sidebarWidth = collapsed ? 52 : 260;
 
@@ -12,6 +17,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <ThreadSidebar
         collapsed={collapsed}
         onToggle={() => setCollapsed((c) => !c)}
+        userEmail={userEmail}
       />
       <main
         style={{ marginLeft: sidebarWidth }}
