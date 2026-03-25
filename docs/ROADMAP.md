@@ -145,11 +145,11 @@
 **Description**: Prototype the Gemini function-calling loop for blockchain analytics queries via Vertex AI. Determine the optimal system prompt structure, function definitions, and multi-step reasoning patterns.
 
 **Requirements**:
-- [ ] Build a minimal standalone script (`research/gemini-tool-prototype.ts`) that runs a function-calling loop via `@ai-sdk/google-vertex`
-- [ ] Test with 5–10 representative blockchain queries from the examples in SPEC.md
-- [ ] Evaluate: does Gemini pick the right tool? Does it produce valid DuneSQL? Does it recover from errors?
-- [ ] Test iterative refinement: user follow-up questions staying in context, chart modifications
-- [ ] Produce `research/gemini-strategy.md` with recommended system prompt, tool schemas, and failure handling patterns
+- [x] Build a minimal standalone script (`research/gemini-tool-prototype.ts`) that runs a function-calling loop via `@ai-sdk/google-vertex`
+- [x] Test with 5–10 representative blockchain queries from the examples in SPEC.md
+- [x] Evaluate: does Gemini pick the right tool? Does it produce valid DuneSQL? Does it recover from errors?
+- [x] Test iterative refinement: user follow-up questions staying in context, chart modifications
+- [x] Produce `research/gemini-strategy.md` with recommended system prompt, tool schemas, and failure handling patterns
 
 **Implementation Notes**:
 - Use `@ai-sdk/google-vertex` with the Vercel AI SDK `generateText` (non-streaming) for the prototype to reduce abstraction
@@ -218,12 +218,12 @@
 **Description**: Implement email/password authentication using Supabase Auth. Login, signup, session management, and protected routes.
 
 **Requirements**:
-- [ ] Implement Login page (`/login`) with email + password form
-- [ ] Implement Signup page (`/signup`) — invite-only or open registration (configurable via env var)
-- [ ] Set up Supabase SSR session management using `@supabase/ssr` middleware
-- [ ] Protect all `/(app)` routes — redirect unauthenticated users to `/login`
-- [ ] Implement logout action (clear session, redirect to `/login`)
-- [ ] Display logged-in user email in sidebar footer
+- [x] Implement Login page (`/login`) with email + password form
+- [x] Implement Signup page (`/signup`) — invite-only or open registration (configurable via env var)
+- [x] Set up Supabase SSR session management using `@supabase/ssr` middleware
+- [x] Protect all `/(app)` routes — redirect unauthenticated users to `/login`
+- [x] Implement logout action (clear session, redirect to `/login`)
+- [x] Display logged-in user email in sidebar footer
 
 **Implementation Notes**:
 - Use `@supabase/ssr` `createServerClient` in Next.js middleware (`middleware.ts`) for session refresh on every request

@@ -10,7 +10,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  LogOut,
 } from "lucide-react";
+import { logout } from "@/app/actions/auth";
 
 interface Thread {
   id: string;
@@ -79,9 +81,14 @@ const NAV_ITEMS = [
 interface ThreadSidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  userEmail: string | null;
 }
 
-export function ThreadSidebar({ collapsed, onToggle }: ThreadSidebarProps) {
+export function ThreadSidebar({
+  collapsed,
+  onToggle,
+  userEmail,
+}: ThreadSidebarProps) {
   const pathname = usePathname();
 
   const pinned = MOCK_THREADS.filter((t) => t.isPinned);
@@ -177,6 +184,25 @@ export function ThreadSidebar({ collapsed, onToggle }: ThreadSidebarProps) {
       )}
 
       {collapsed && <div className="flex-1" />}
+
+      {/* Footer: user email + logout */}
+      <div className="mx-3 border-t border-[var(--cd-border-subtle)]" />
+      <div className="shrink-0 px-2 py-2">
+        <form action={logout}>
+          <button
+            type="submit"
+            title={collapsed ? "Sign out" : undefined}
+            className="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-sm text-[var(--cd-text-secondary)] transition-colors duration-100 hover:bg-[var(--cd-surface-overlay)] hover:text-[var(--cd-text-primary)]"
+          >
+            <LogOut size={16} strokeWidth={1.5} className="shrink-0" />
+            {!collapsed && (
+              <span className="flex-1 truncate text-left">
+                {userEmail ?? "Sign out"}
+              </span>
+            )}
+          </button>
+        </form>
+      </div>
     </aside>
   );
 }
@@ -202,7 +228,11 @@ function ThreadItem({
       {pinned ? (
         <Pin size={12} strokeWidth={1.5} className="shrink-0 opacity-60" />
       ) : (
-        <MessageSquare size={12} strokeWidth={1.5} className="shrink-0 opacity-40" />
+        <MessageSquare
+          size={12}
+          strokeWidth={1.5}
+          className="shrink-0 opacity-40"
+        />
       )}
       <span className="flex-1 truncate">{thread.title}</span>
       <span className="shrink-0 text-[11px] text-[var(--cd-text-tertiary)] opacity-0 transition-opacity group-hover:opacity-100">

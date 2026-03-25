@@ -2,23 +2,23 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { login, type AuthState } from "@/app/actions/auth";
+import { signup, type AuthState } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [state, action, pending] = useActionState<AuthState, FormData>(
-    login,
+    signup,
     null
   );
 
   return (
     <div className="rounded-xl border border-[var(--cd-border)] bg-[var(--cd-surface)] p-8">
       <h1 className="mb-1 text-xl font-semibold text-[var(--cd-text-primary)]">
-        Sign in
+        Create account
       </h1>
       <p className="mb-6 text-sm text-[var(--cd-text-secondary)]">
-        Enter your credentials to access chat-dune.
+        Sign up to start using chat-dune.
       </p>
 
       <form action={action} className="flex flex-col gap-4">
@@ -50,9 +50,10 @@ export default function LoginPage() {
             id="password"
             name="password"
             type="password"
-            placeholder="••••••••"
-            autoComplete="current-password"
+            placeholder="Min. 8 characters"
+            autoComplete="new-password"
             required
+            minLength={8}
           />
         </div>
 
@@ -63,21 +64,16 @@ export default function LoginPage() {
         )}
 
         <Button type="submit" disabled={pending} className="mt-1 w-full">
-          {pending ? "Signing in…" : "Sign in"}
+          {pending ? "Creating account…" : "Create account"}
         </Button>
       </form>
 
-      {process.env.NEXT_PUBLIC_SIGNUP_ENABLED !== "false" && (
-        <p className="mt-4 text-center text-sm text-[var(--cd-text-secondary)]">
-          No account?{" "}
-          <Link
-            href="/signup"
-            className="text-[var(--cd-accent)] hover:underline"
-          >
-            Sign up
-          </Link>
-        </p>
-      )}
+      <p className="mt-4 text-center text-sm text-[var(--cd-text-secondary)]">
+        Already have an account?{" "}
+        <Link href="/login" className="text-[var(--cd-accent)] hover:underline">
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }
