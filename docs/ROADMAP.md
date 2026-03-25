@@ -358,7 +358,30 @@
 
 ## Phase 4: Nice to Have
 
-### 4.1 RPC / Node Data Integration
+### 4.1 Full Staking Addresses Mapping, Information and Context
+
+**Description**: Enrich the address mapping database with complete information about Starknet staking participants — validators, delegation pools, and staker addresses — including validator names, pool metadata, stake amounts, and staking event selectors. This enables the analytics copilot to produce human-readable, context-rich output for any staking-related query.
+
+**Requirements**:
+- [ ] Complete the pool→validator name mapping for all 9 delegation pool contracts currently in `address-mappings-seed.csv` (noted as incomplete in the seed data)
+- [ ] Source and add missing validator metadata: operator name, website, commission rate, pool contract address
+- [ ] Enrich the 210 staker addresses in the seed data with known entity labels where identifiable (institutions, exchanges, known wallets)
+- [ ] Add staking event selectors to `research/starknet-selectors.json` and the `starknet_selectors` DB table: Stake, Unstake, ClaimRewards, and any delegation-specific events
+- [ ] Add a `starknet_staking_validators` reference table to the DB schema: `(id, validator_address, name, pool_address, commission_rate, website, created_at)`
+- [ ] Inject staking-specific context into the system prompt: known validator addresses, pool addresses, staking contract address, delegation mechanics
+- [ ] Update `supabase/seed.sql` to seed the `starknet_staking_validators` table
+- [ ] Produce an updated `address-mappings-seed.csv` with the completed staking context
+
+**Implementation Notes**:
+- Source validator metadata from the Starknet staking dashboard, on-chain registry, or community-maintained lists
+- The 9 delegation pool contracts are already in the seed data — the missing piece is mapping each pool address to its validator name and metadata
+- Staking event selectors can be derived from the Cairo ABI of the Starknet staking contract (verify on Starkscan/Voyager)
+- This data directly improves the quality of AI responses to queries like "show me staking rewards by validator" or "who are the top delegators to Ekubo's pool"
+- Cross-reference with `research/internal-staking-table-v2.csv` and `research/internal-resolver-v2.1.csv` as primary sources
+
+---
+
+### 4.2 RPC / Node Data Integration
 
 **Description**: Add Starknet RPC as a complementary data source for cases where Dune lacks real-time or specific raw data.
 
@@ -379,7 +402,7 @@
 
 ---
 
-### 4.2 Export and Sharing
+### 4.3 Export and Sharing
 
 **Description**: Enable users to export results and share conversation snapshots with colleagues.
 
@@ -397,7 +420,7 @@
 
 ---
 
-### 4.3 Ethereum Chain Support
+### 4.4 Ethereum Chain Support
 
 **Description**: Extend Dune integration and system prompt to support Ethereum queries alongside Starknet.
 
@@ -415,7 +438,7 @@
 
 ---
 
-### 4.4 Production Hardening
+### 4.5 Production Hardening
 
 **Description**: Observability, error handling, rate limiting, and security hardening for internal production deployment.
 
@@ -435,9 +458,58 @@
 
 ---
 
-## Phase 5: Future
+## Phase 5: End-to-End Tests and Data Context Updates
 
-### 5.1 Multi-Chain Expansion
+### 5.1 End-to-End Test Suite
+
+**Description**: A comprehensive E2E test suite that validates the full user-facing flow — from typing a query in the chat UI to receiving a rendered chart — and catches regressions across the AI, Dune, and frontend layers.
+
+**Requirements**:
+- [ ] Set up Playwright for browser-based E2E tests against a local dev environment
+- [ ] Write E2E tests for the core happy paths:
+  - User logs in → creates a new thread → asks a blockchain query → receives a chart
+  - User asks a follow-up question → chart updates correctly
+  - User pins a thread → it appears in Dashboards
+  - CSV upload on the Mappings page → addresses appear in subsequent queries
+- [ ] Write E2E tests for error states:
+  - Dune query fails → user sees a graceful error message, not a broken UI
+  - Invalid chart spec → fallback data table is shown
+- [ ] Add an AI response quality smoke test: run 3–5 fixed benchmark queries and assert that tool calls are made (not just that the UI renders)
+- [ ] Integrate E2E tests into CI: run on every PR against a seeded local Supabase instance
+
+**Implementation Notes**:
+- Use Playwright's `page.waitForSelector` to assert chart rendering (the chart container div)
+- For AI smoke tests, mock the Vertex AI response with pre-recorded tool call sequences to avoid flakiness and cost
+- Seed the local DB with `supabase/seed.sql` before each test run via a Playwright global setup script
+- E2E tests should run in under 2 minutes total — keep them focused on critical paths, not exhaustive coverage
+
+---
+
+### 5.2 Data Context Update Process
+
+**Description**: Establish a repeatable process for keeping the address mappings, event selector registry, and staking validator data up to date as the Starknet ecosystem evolves. Stale context degrades AI response quality silently.
+
+**Requirements**:
+- [ ] Document the update process for each data source in `docs/DATA-MAINTENANCE.md`:
+  - Address mappings: how to export from internal resolver, transform, and re-import via CSV upload
+  - Event selectors: how to verify a new selector on Starkscan/Voyager and add it to the registry
+  - Staking validators: how to update validator metadata when commission rates or names change
+- [ ] Add a `scripts/validate-context.ts` script that checks for known staleness signals:
+  - New protocols appearing in top event counts that have no selector in the registry
+  - Addresses appearing frequently in query results that have no label in the mapping store
+- [ ] Add a monthly reminder workflow (GitHub issue template or cron-based) to run the validation script and review its output
+- [ ] Version the selector registry: add a `last_verified_at` column to `starknet_selectors` and flag entries not verified in the last 90 days
+
+**Implementation Notes**:
+- The `validate-context.ts` script can use the Dune MCP tools to run a quick top-addresses and top-selectors query, then diff the results against the current DB contents
+- This is a process task as much as a code task — the documentation in `DATA-MAINTENANCE.md` is the primary deliverable
+- Aim for a quarterly full review cycle with monthly lightweight checks
+
+---
+
+## Phase 6: Future
+
+### 6.1 Multi-Chain Expansion
 
 **Description**: Extend the platform to support all Dune-indexed chains beyond Ethereum and Starknet, making chat-dune a universal blockchain analytics copilot.
 
@@ -451,7 +523,7 @@
 
 ---
 
-### 5.2 Scheduled Reports and Alerts
+### 6.2 Scheduled Reports and Alerts
 
 **Description**: Enable users to schedule recurring analytics reports and set up threshold-based alerts on blockchain activity.
 
@@ -465,7 +537,7 @@
 
 ---
 
-### 5.3 Collaborative Features
+### 6.3 Collaborative Features
 
 **Description**: Enable teams to collaborate on analytics threads, share annotations, and build shared knowledge.
 
@@ -479,7 +551,7 @@
 
 ---
 
-### 5.4 Advanced AI Capabilities
+### 6.4 Advanced AI Capabilities
 
 **Description**: Evolve the AI layer from reactive question-answering to proactive insight generation and anomaly detection.
 
