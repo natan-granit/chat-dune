@@ -237,24 +237,24 @@
 **Description**: Implement the core Gemini streaming chat loop with function calling via Vertex AI. This is the intelligence layer of the entire application.
 
 **Requirements**:
-- [ ] Define Gemini function schemas (Zod + Vercel AI SDK tool definitions):
+- [x] Define Gemini function schemas (Zod + Vercel AI SDK tool definitions):
   - `execute_dune_query(sql: string, description: string)` → returns rows + column names
   - `render_chart(spec: ChartSpec)` → signals frontend to render a chart
   - `lookup_address_mappings(addresses: string[])` → returns label data for known addresses
   - `fetch_rpc_data(method: string, params: unknown[], chain: string)` → calls Starknet RPC
-- [ ] Implement `POST /api/chat` route handler with streaming via Vercel AI SDK + `@ai-sdk/google-vertex`
-- [ ] Implement the function call loop: send → receive function_call → execute → send function_response → repeat
-- [ ] Inject workspace address mappings into the system prompt at request time
-- [ ] Inject the Starknet event selector registry (from `starknet_selectors` table) into the system prompt
-- [ ] Implement system prompt in `lib/chat/system-prompt.ts` covering:
+- [x] Implement `POST /api/chat` route handler with streaming via Vercel AI SDK + `@ai-sdk/google`
+- [x] Implement the function call loop: send → receive function_call → execute → send function_response → repeat
+- [x] Inject workspace address mappings into the system prompt at request time
+- [x] Inject the Starknet event selector registry (from `starknet_selectors` table) into the system prompt
+- [x] Implement system prompt in `lib/chat/system-prompt.ts` covering:
   - Role definition: Starknet blockchain analytics copilot
   - Available Dune table namespaces for Starknet
   - Starknet event selector map (keys[]/data[] layouts for known protocols)
   - Chart spec format (exact JSON schema)
   - Rules: prefer Dune, fall back to RPC for real-time data, never expose SQL unless asked
   - Address mapping context (injected dynamically)
-- [ ] Persist messages (user + assistant) to Supabase after each exchange
-- [ ] Handle tool execution errors gracefully (feed error message back to Gemini for recovery)
+- [x] Persist messages (user + assistant) to Supabase after each exchange
+- [x] Handle tool execution errors gracefully (feed error message back to Gemini for recovery)
 
 **Implementation Notes**:
 - Use Vercel AI SDK's `streamText` with `createVertex()` from `@ai-sdk/google-vertex` provider
